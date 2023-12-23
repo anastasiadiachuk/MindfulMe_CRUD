@@ -1,0 +1,51 @@
+﻿<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">MindfulMe CRUD</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+<style>
+    h5 {
+        color: white
+    }
+</style>
+<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <h5>Users</h5>
+            <NavLink class="nav-link" href="createuser">Create User</NavLink>
+            <NavLink class="nav-link" href="deleteuser">Delete User</NavLink>
+            <NavLink class="nav-link" href="userlist">View All Users</NavLink>
+            <NavLink class="nav-link" href="updateuser">Update User</NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <h5>Articles</h5>
+            <NavLink class="nav-link" href="createarticle">Create Article</NavLink>
+            <NavLink class="nav-link" href="deletearticle">Delete Article</NavLink>
+            <NavLink class="nav-link" href="articlelist">View All Articles</NavLink>
+            <NavLink class="nav-link" href="updatearticle">Update Article</NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <h5>Offers</h5>
+            <NavLink class="nav-link" href="createoffer">Create Offer</NavLink>
+            <NavLink class="nav-link" href="deleteoffer">Delete Offer</NavLink>
+            <NavLink class="nav-link" href="offerlist">View All Offers</NavLink>
+            <NavLink class="nav-link" href="updateoffer">Update Offer</NavLink>
+        </div>
+    </nav>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+}

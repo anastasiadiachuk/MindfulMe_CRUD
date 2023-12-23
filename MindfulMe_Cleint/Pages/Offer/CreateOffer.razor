@@ -1,0 +1,56 @@
+﻿@page "/createoffer"
+@using Microsoft.AspNetCore.Components
+@using Entities.ViewModels.Offer
+@inject HttpClient Http
+
+<h3>Create Offer</h3>
+
+<EditForm Model="@createOfferViewModel" OnValidSubmit="CreateOffer_">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="Description">Description:</label>
+        <InputText id="Description" @bind-Value="createOfferViewModel.Description" class="form-control" style="width: 50%" />
+    </div>
+
+    <div class="form-group">
+        <label for="Content">Content:</label>
+        <InputTextArea id="Content" @bind-Value="createOfferViewModel.Content" class="form-control" style="width: 50%" rows="4" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(successMessage))
+{
+    <div class="alert alert-success" role="alert">
+        @successMessage
+    </div>
+}
+
+@code {
+    private CreateOfferViewModel createOfferViewModel = new CreateOfferViewModel();
+    private string successMessage = string.Empty;
+
+    private async Task CreateOffer_()
+    {
+        var response = await Http.PostAsJsonAsync("https://localhost:7286/create_offer", createOfferViewModel);
+
+        if (response.IsSuccessStatusCode)
+        {
+            Console.WriteLine("success");
+            createOfferViewModel = new CreateOfferViewModel();
+            successMessage = "Offer created successfully!";
+            var timer = new System.Timers.Timer(5000);
+            timer.Elapsed += (sender, e) => { successMessage = string.Empty; StateHasChanged(); };
+            timer.Start();
+        }
+        else
+        {
+            var errorMessage = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"Error: {errorMessage}");
+        }
+    }
+}
+

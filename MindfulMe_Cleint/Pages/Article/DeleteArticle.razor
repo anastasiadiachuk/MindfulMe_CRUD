@@ -1,0 +1,62 @@
+﻿@page "/deletearticle"
+@using System.Net
+@inject HttpClient Http
+
+<h3>Delete Article</h3>
+
+<div class="form-group">
+    <label for="articleId">Article ID:</label>
+    <input id="articleId" @bind="articleId" class="form-control" style="width: 50%" />
+</div>
+
+<button type="button" class="btn btn-danger" @onclick="DeleteArticle_">Delete Article</button>
+
+@if (!string.IsNullOrEmpty(successMessage))
+{
+    <div class="alert alert-success mt-3" role="alert">
+        @successMessage
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger mt-3" role="alert">
+        @errorMessage
+    </div>
+}
+
+@code {
+    private int articleId;
+    private string successMessage;
+    private string errorMessage;
+
+    private async Task DeleteArticle_()
+    {
+        if (articleId <= 0)
+        {
+            return;
+        }
+
+        var response = await Http.DeleteAsync($"https://localhost:7286/delete_article/{articleId}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            successMessage = "Article deleted successfully!";
+            articleId = 0;
+            var timer = new System.Timers.Timer(5000);
+            timer.Elapsed += (sender, e) => { successMessage = string.Empty; StateHasChanged(); };
+            timer.Start();
+        }
+        else if (response.StatusCode == HttpStatusCode.NotFound)
+        {
+            errorMessage = "Article not found.";
+            var timer = new System.Timers.Timer(5000);
+            timer.Elapsed += (sender, e) => { errorMessage = string.Empty; StateHasChanged(); };
+            timer.Start();
+        }
+        else
+        {
+            errorMessage = "An error occurred while deleting the article.";
+        }
+    }
+}

@@ -1,0 +1,49 @@
+﻿@page "/offerlist"
+@using Microsoft.AspNetCore.Components
+@using Entities.ViewModels.Offer
+@inject HttpClient Http
+
+<h3>View All Offers</h3>
+
+@if (offers != null && offers.Any())
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Offer ID</th>
+            <th>Description</th>
+            <th>Content</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var offer in offers)
+        {
+            <tr>
+                <td>@offer.OfferId</td>
+                <td>@TruncateDescription(offer.Description, 50)</td>
+                <td>@offer.Content</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No offers available.</p>
+}
+
+@code {
+    private List<OfferViewModel> offers;
+
+    protected override async Task OnInitializedAsync()
+    {
+        offers = await Http.GetFromJsonAsync<List<OfferViewModel>>("https://localhost:7286/offers_list");
+    }
+
+    private string TruncateDescription(string description, int maxLength)
+    {
+        if (string.IsNullOrEmpty(description))
+            return string.Empty;
+        return description.Length <= maxLength ? description : $"{description.Substring(0, maxLength)}...";
+    }
+}

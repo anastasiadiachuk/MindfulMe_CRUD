@@ -1,0 +1,45 @@
+﻿@page "/userlist"
+@using Entities.ViewModels.User
+@inject HttpClient Http
+
+<h3>View All Users</h3>
+
+@if (users != null && users.Any())
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>User ID</th>
+            <th>Email</th>
+            <td>Password</td>
+            <th>User Name</th>
+            <th>User Type</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var user in users)
+        {
+            <tr>
+                <td>@user.UserId</td>
+                <td>@user.Email</td>
+                <td>@user.Password</td>
+                <td>@user.UserName</td>
+                <td>@user.UserType</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No users available.</p>
+}
+
+@code {
+    private List<UserViewModel> users;
+
+    protected override async Task OnInitializedAsync()
+    {
+        users = await Http.GetFromJsonAsync<List<UserViewModel>>("https://localhost:7286/user_list");
+    }
+}

@@ -1,0 +1,71 @@
+﻿@page "/createuser"
+@using Microsoft.AspNetCore.Components
+@using Entities.Enums
+@using Entities.ViewModels.User
+@inject HttpClient Http
+
+<h3>Create User</h3>
+
+<EditForm Model="@createUserViewModel" OnValidSubmit="CreateUser_">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="Email">Email:</label>
+        <InputText id="Email" @bind-Value="createUserViewModel.Email" class="form-control" style="width: 50%" />
+    </div>
+
+    <div class="form-group">
+        <label for="Password">Password:</label>
+        <InputText id="Password" @bind-Value="createUserViewModel.Password" class="form-control" style="width: 50%" />
+    </div>
+
+    <div class="form-group">
+        <label for="UserName">User Name:</label>
+        <InputText id="UserName" @bind-Value="createUserViewModel.UserName" class="form-control" style="width: 50%" />
+    </div>
+
+    <div class="form-group">
+        <label for="UserType">User Type:</label>
+        <InputSelect id="UserType" @bind-Value="createUserViewModel.UserType" class="form-control" style="width: 50%">
+            @foreach (UserType userType in Enum.GetValues(typeof(UserType)))
+            {
+                <option value="@userType">@userType</option>
+            }
+        </InputSelect>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(successMessage))
+{
+    <div class="alert alert-success" role="alert">
+        @successMessage
+    </div>
+}
+
+@code {
+    private CreateUserViewModel createUserViewModel = new CreateUserViewModel();
+    private string successMessage = string.Empty;
+
+    private async Task CreateUser_()
+    {
+        var response = await Http.PostAsJsonAsync("https://localhost:7286/create_user", createUserViewModel);
+
+        if (response.IsSuccessStatusCode)
+        {
+            Console.WriteLine("success");
+            createUserViewModel = new CreateUserViewModel();
+            successMessage = "User created successfully!";
+            var timer = new System.Timers.Timer(5000);
+            timer.Elapsed += (sender, e) => { successMessage = string.Empty; StateHasChanged(); };
+            timer.Start();
+        }
+        else
+        {
+            var errorMessage = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"Error: {errorMessage}");
+        }
+    }
+}

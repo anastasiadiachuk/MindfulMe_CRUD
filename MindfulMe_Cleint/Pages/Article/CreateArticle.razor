@@ -1,0 +1,66 @@
+﻿@page "/createarticle"
+@using Microsoft.AspNetCore.Components
+@using Entities.ViewModels.Article
+@inject HttpClient Http
+
+<h3>Create Article</h3>
+
+<EditForm Model="@createArticleViewModel" OnValidSubmit="CreateArticle_">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="Title">Title:</label>
+        <InputText id="Title" @bind-Value="createArticleViewModel.Title" class="form-control" style="width: 50%" />
+    </div>
+
+    <div class="form-group">
+        <label for="Description">Description:</label>
+        <InputText id="Description" @bind-Value="createArticleViewModel.Description" class="form-control" style="width: 50%" />
+    </div>
+
+    <div class="form-group">
+        <label for="Content">Content:</label>
+        <InputTextArea id="Content" @bind-Value="createArticleViewModel.Content" class="form-control" style="width: 50%" rows="4" />
+    </div>
+
+    <div class="form-group">
+        <label for="AuthorUsername">Author Username:</label>
+        <InputText id="AuthorUsername" @bind-Value="createArticleViewModel.AuthorUsername" class="form-control" style="width: 50%" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(successMessage))
+{
+    <div class="alert alert-success" role="alert">
+        @successMessage
+    </div>
+}
+
+@code {
+    private CreateArticleViewModel createArticleViewModel = new CreateArticleViewModel();
+    private string successMessage = string.Empty;
+
+    private async Task CreateArticle_()
+    {
+        var response = await Http.PostAsJsonAsync("https://localhost:7286/create_article", createArticleViewModel);
+
+        if (response.IsSuccessStatusCode)
+        {
+            Console.WriteLine("success");
+            createArticleViewModel = new CreateArticleViewModel();
+            successMessage = "Article created successfully!";
+            var timer = new System.Timers.Timer(5000);
+            timer.Elapsed += (sender, e) => { successMessage = string.Empty; StateHasChanged(); };
+            timer.Start();
+        }
+        else
+        {
+            var errorMessage = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"Error: {errorMessage}");
+        }
+    }
+}
+
